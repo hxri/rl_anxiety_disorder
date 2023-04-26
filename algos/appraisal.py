@@ -23,7 +23,7 @@ def motivational_relevance(obs):
         idx, goal_pos = goal[0], goal[1:]
         dist = torch.norm(agent_pos[idx] - goal_pos.float(), 1)
         relevance[idx] = 1 - (dist - 1) / (2 * (w - 1))
-    norm = NormalizeData(relevance, min, max)
+    norm = 1/(1+torch.exp(relevance))
     return norm
 
 def novelty(logits):
@@ -38,7 +38,7 @@ def novelty(logits):
     P = torch.softmax(logits, dim=1)
     Q = torch.full(P.size(), 1 / num_actions)
     nov = -torch.sum(Q * torch.log(Q / P), dim=1)
-    norm = NormalizeData(nov, min, max)
+    norm = 1/(1+torch.exp(nov))
     return norm
 
 def certainity(logits): # Entropy
@@ -57,7 +57,7 @@ def certainity(logits): # Entropy
 
     probs = F.softmax(logits, dim=1)
     entropy = -torch.sum(probs * torch.log(probs), dim=1)
-    norm = NormalizeData(entropy, min, max)
+    norm = 1/(1+torch.exp(entropy))
     return norm
 
 def coping_potential(logits):
@@ -82,7 +82,7 @@ def coping_potential(logits):
 
     # Calculate coping potential
     coping_pot = expected_reward - actual_reward
-    norm = NormalizeData(coping_pot, min, max)
+    norm = 1/(1+torch.exp(coping_pot))
     return norm
 
 def anticipation(logits):
@@ -108,7 +108,7 @@ def anticipation(logits):
     # Calculate the anticipation as the inverse of the entropy
     anticipation = 1.0 / entropy
     # Return the tensor of anticipations
-    norm = NormalizeData(anticipation, min, max)
+    norm = 1/(1+torch.exp(anticipation))
     return norm
 
 
@@ -156,7 +156,7 @@ def goal_congruence(logits):
     goal_congruence = -(entropy + kl_divergence)
     # print(goal_congruence.shape)
     # Return the goal congruence score as a PyTorch tensor
-    norm = NormalizeData(goal_congruence, min, max)
+    norm = 1/(1+torch.exp(goal_congruence))
     return norm
 
 # def anticipation(obs, logits):
