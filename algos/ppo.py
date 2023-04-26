@@ -22,7 +22,7 @@ class PPOAlgo(BaseAlgo):
         self.clip_eps = clip_eps
         self.epochs = epochs
         self.batch_size = batch_size
-        self.appraisal_coef = 0.001
+        self.appraisal_coef = 0.001 
         self.use_appraisal = appraisal
 
         if(self.use_appraisal == True):
@@ -107,7 +107,11 @@ class PPOAlgo(BaseAlgo):
 
                     # appraisal_targets = torch.tensor([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
                     
-                    appraisal_loss = F.mse_loss(torch.mean(appraisal, 0), self.appraisal_targets, reduction='none').mean(-1, keepdim=True)
+                    # appraisal_loss = F.mse_loss(torch.mean(appraisal, 0), self.appraisal_targets, reduction='none').mean(-1, keepdim=True)
+                    # appraisal_loss = F.kl_div(torch.mean(appraisal, 0), self.appraisal_targets, reduction='batchmean').mean(-1, keepdim=True)
+                    appraisal_loss = F.binary_cross_entropy(torch.mean(appraisal, 0), self.appraisal_targets).mean(-1, keepdim=True)
+                    # appraisal_loss = F.smooth_l1_loss(torch.mean(appraisal, 0), self.appraisal_targets).mean(-1, keepdim=True)
+
                     # appraisal_loss = (accountable * appraisal_loss).mean()
 
                     

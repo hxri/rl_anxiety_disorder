@@ -3,6 +3,7 @@ import time
 import numpy as np
 import torch
 import os
+import csv
 
 import gym_minigrid
 import utils
@@ -27,7 +28,7 @@ parser.add_argument("--pause", type=float, default=0.1,
                     help="pause duration between two consequent actions of the agent (default: 0.1)")
 parser.add_argument("--gif", type=str, default=None,
                     help="store output as gif with the given filename")
-parser.add_argument("--episodes", type=int, default=1000000,
+parser.add_argument("--episodes", type=int, default=100,
                     help="number of episodes to visualize")
 parser.add_argument("--memory", action="store_true", default=False,
                     help="add a LSTM to the model")
@@ -75,6 +76,7 @@ if not os.path.exists("storage/" + args.model + "/results/"):
 
 # Create a window to view the environment
 env.render('human')
+anxiety_per_episode = []
 for episode in range(args.episodes):
     obs = env.reset()
 
@@ -90,8 +92,8 @@ for episode in range(args.episodes):
                 frames.append(np.moveaxis(env.render("rgb_array"), 2, 0))
 
             dist, action, appraisal = agent.get_action(obs, dist, appraisal, accountable)
-            emotions = geneva_affect_grid(np.array(appraisal)[:,-1])
-            anx = edas_anxiety(emotions)
+            emotions = estimate_emotions_cpm(np.array(appraisal)[:,-1])
+            anx = map_emotions_to_anxiety(emotions)
             anxiety.append(anx)
 
             outfile.write("Emotion : \n" + str(emotions) + "\n")
@@ -119,8 +121,10 @@ for episode in range(args.episodes):
         # fig.savefig("storage/" + args.model + "/results/{}_plot.png" .format(episode))
         # plt.close()
         
-        # dat = edas_anxiety(anxiety)
-        # outfile.write('\n\n' + dat)
+        msg, dat, aval = clopper_pearson(anxiety)
+        print(msg)
+        anxiety_per_episode.append(dat)
+        outfile.write('\n\n' + msg)
         outfile.close()
     # print(anxiety)
     # print("\n")
@@ -129,6 +133,9 @@ for episode in range(args.episodes):
     # else:
     #     print("Agent is anxiety free")
     # print("End of episode {}" .format(episode))
+with open("storage/" + args.model + "/results/anxiety.csv", 'w', newline='') as myfile:
+    wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+    wr.writerow(anxiety_per_episode)
 
 if args.gif:
     print("Saving gif... ", end="")

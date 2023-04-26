@@ -42,16 +42,19 @@ def clopper_pearson(anxiety):
     ci_low, ci_high = beta.interval(1-alpha, prop_anxiety*num_instances+1, (1-prop_anxiety)*num_instances+1)
 
     # Determine if the confidence interval includes the threshold for clinically significant anxiety
-    state_cutoff = 0.60
-    trait_cutoff = 0.58
+    cut_off = 0.90
     
-    clin_cutoff = state_cutoff if p_anxiety < 0.5 else trait_cutoff  # use appropriate cutoff depending on assumed probability
-    clin_sig = prop_anxiety >= clin_cutoff
+    # clin_cutoff = state_cutoff if p_anxiety < 0.5 else trait_cutoff  # use appropriate cutoff depending on assumed probability
+    clin_sig = prop_anxiety >= cut_off
 
-    # Print the results
-    print(f"Proportion of positive cases: {prop_anxiety:.2f}")
-    print(f"95% confidence interval: [{ci_low:.2f}, {ci_high:.2f}]")
-    print(f"Clinically significant levels of anxiety: {clin_sig}")
+    # # Print the results
+    # print(f"Proportion of positive cases: {prop_anxiety:.2f}")
+    # print(f"95% confidence interval: [{ci_low:.2f}, {ci_high:.2f}]")
+    # print(f"Clinically significant levels of anxiety: {clin_sig}")
 
-    msg = f"Proportion of positive cases: {prop_anxiety:.2f} | 95% confidence interval: [{ci_low:.2f}, {ci_high:.2f}] | Clinically significant levels of anxiety: {clin_sig}"
-    return msg
+    msg = f"95% confidence interval: [{ci_low:.2f}, {ci_high:.2f}] | Clinically significant levels of anxiety: {clin_sig}"
+    if(clin_sig == True):
+        out = 1
+    else:
+        out = 0
+    return msg, out, prop_anxiety

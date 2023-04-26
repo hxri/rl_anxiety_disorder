@@ -120,10 +120,7 @@ class ACModel(nn.Module, RecurrentACModel):
         # and the appraisal. The appraisal is concatenated into the
         # cell state, since appraisal contains episodic information.
         h = memory[:, :self.semi_memory_size]
-        # if self.use_appraisal:
-        #     c = torch.hstack((memory[:, (self.semi_memory_size + 7):], appraisal)) 
-        # else:
-        #     c = memory[:, self.semi_memory_size:] # Turn this on for monitoring only mode.
+        # c = memory[:, self.semi_memory_size:] # Turn this on for monitoring only mode.
         c = torch.hstack((memory[:, (self.semi_memory_size + 7):], appraisal)) 
 
         hidden = self.memory_rnn(x, (h, c))

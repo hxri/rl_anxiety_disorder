@@ -133,7 +133,7 @@ if __name__ == '__main__':
     if(args.appraisal):
         print("\n############### Using Appraisal for training ###############\n")
         induce_appraisal = True
-        acmodel = ACModel(obs_space, envs[0].action_space, args.text, args.appraisal)
+    acmodel = ACModel(obs_space, envs[0].action_space, args.text, args.appraisal)
     if "model_state" in status:
         acmodel.load_state_dict(status["model_state"])
     acmodel.to(device)
